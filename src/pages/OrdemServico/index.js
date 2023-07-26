@@ -1,31 +1,39 @@
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import OSList from './OSList';
-import {CloseModalButton, Container, ModalHeader} from './styles';
-import {getOSDoMes} from '../../data/services/OrdemServicosServices.js';
-import {AuthContext} from '../../context/AuthContext';
-import {colors} from '../../styles';
-import {Alert} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { View, Text, StyleSheet } from "react-native";
+import OSList from "./OSList";
+import { CloseModalButton, Container, ModalHeader } from "./styles";
+import { getOSDoMes } from "../../data/services/OrdemServicosServices.js";
+import { AuthContext } from "../../context/AuthContext";
+import { colors } from "../../styles";
+import { Alert } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {Modalize} from 'react-native-modalize';
-import {Platform} from 'react-native';
-import {TouchableOpacity} from 'react-native';
-import ControlledInput from '../../components/ControlledInput';
-import { useForm } from 'react-hook-form';
-import ButtonDefault from '../../components/ButtonDefault';
-import { Title } from '../Detalhes/AcoesPage/styles';
-import ControlledDateTimePicker from '../../components/ControlledDateTimePicker';
-import { AppContext } from '../../context/AppContext';
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { Modalize } from "react-native-modalize";
+import { Platform } from "react-native";
+import { TouchableOpacity } from "react-native";
+import ControlledInput from "../../components/ControlledInput";
+import { useForm } from "react-hook-form";
+import ButtonDefault from "../../components/ButtonDefault";
+import { Title } from "../Detalhes/AcoesPage/styles";
+import ControlledDateTimePicker from "../../components/ControlledDateTimePicker";
+import { AppContext } from "../../context/AppContext";
 
 const TabNavigator = createMaterialTopTabNavigator();
 
-export default function OrdemServico({navigation, osData}) {
+export default function OrdemServico({ navigation, osData }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [preventivaOS, setPreventiva] = useState([]);
-  const { ordens, setAllOrdens, loadingStoragedOrdens } = useContext(AppContext);
+  const { ordens, setAllOrdens, loadingStoragedOrdens } =
+    useContext(AppContext);
 
   const { control, handleSubmit } = useForm();
 
@@ -33,7 +41,7 @@ export default function OrdemServico({navigation, osData}) {
 
   const modalizeRef = useRef(null);
 
-  const {userCode} = useContext(AuthContext);
+  const { userCode } = useContext(AuthContext);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -43,7 +51,7 @@ export default function OrdemServico({navigation, osData}) {
             name="search"
             size={25}
             color={colors.primary}
-            style={{marginRight: 15}}
+            style={{ marginRight: 15 }}
           />
         </TouchableOpacity>
       ),
@@ -55,30 +63,30 @@ export default function OrdemServico({navigation, osData}) {
 
     async function getOS() {
       try {
-        const os = await getOSDoMes({tecnicoId: userCode});
+        const os = await getOSDoMes({ tecnicoId: userCode });
         // console.log('hmoe', os);
         if (!canceld) {
           setLoading(false);
           await setAllOrdens(os);
           if (!os.length > 0 && navigation.isFocused()) {
-            Alert.alert('Não encontramos nenhum registro.')
+            Alert.alert("Não encontramos nenhum registro.");
           }
         }
       } catch (error) {
-        console.log('error:home - ', error.message);
+        console.log("error:home - ", error.message);
         if (!canceld) {
           setLoading(false);
-          navigation.isFocused() && Alert.alert('Deu um erro!');
+          navigation.isFocused() && Alert.alert("Deu um erro!");
         }
       }
     }
 
-    if(!loadingStoragedOrdens) {
-      if(ordens.length == 0) {
-        console.log('buscou');
+    if (!loadingStoragedOrdens) {
+      if (ordens.length == 0) {
+        console.log("buscou");
         getOS();
       } else {
-        console.log('cheia');
+        console.log("cheia");
         setLoading(false);
       }
     }
@@ -97,30 +105,36 @@ export default function OrdemServico({navigation, osData}) {
   }
 
   function getOSAbertas(os) {
-    console.log('getOS:abertas ');
-    const osAbertas = os.filter(o => o.VISITA == null);
+    console.log("getOS:abertas ");
+    const osAbertas = os.filter((o) => o.VISITA == null);
 
     const sortedOsAbertas = sortByPriority(osAbertas);
-    
+
     return sortedOsAbertas;
   }
   function getOSFechadas(os) {
-    console.log('getOS:fechadas ');
-    const osFechadas = os.filter(o => o.VISITA != null);
+    console.log("getOS:fechadas ");
+    const osFechadas = os.filter((o) => o.VISITA != null);
 
-    console.log(osFechadas.length);
-    
+    console.log("Fechadas " + osFechadas.length);
+
     const sortedOsFechadas = sortByPriority(osFechadas);
-    
+
     return sortedOsFechadas;
   }
 
   function sortByPriority(os) {
-    const priority1 = os.filter(o => o.id_tipo_os == 4 || o.id_tipo_os == 5 || o.id_tipo_os == 6);
-    const priority2 = os.filter(o => o.id_tipo_os == 1 || o.id_tipo_os == 2 || o.id_tipo_os == 3);
-    const priority3 = os.filter(o => o.id_tipo_os == 7);
+    const priority1 = os.filter(
+      (o) => o.id_tipo_os == 4 || o.id_tipo_os == 5 || o.id_tipo_os == 6
+    );
+    const priority2 = os.filter(
+      (o) => o.id_tipo_os == 1 || o.id_tipo_os == 2 || o.id_tipo_os == 3
+    );
+    const priority3 = os.filter((o) => o.id_tipo_os == 7);
 
-    const sortedOs = [...priority1, ...priority2, ...priority3];
+    const sortedOs = [...priority1, ...priority2, ...priority3]; //RETORNA UM ARRAY VAZIO = []
+
+    console.log(sortedOs);
 
     return sortedOs;
   }
@@ -128,17 +142,17 @@ export default function OrdemServico({navigation, osData}) {
   async function refreshSearch() {
     try {
       setRefreshing(true);
-      
-      const result = await getOSDoMes({tecnicoId: userCode});
+
+      const result = await getOSDoMes({ tecnicoId: userCode });
 
       await setAllOrdens(result);
       setRefreshing(false);
 
       if (!result.length > 0) {
-        Alert.alert('Não encontramos nenhum registro.')
+        Alert.alert("Não encontramos nenhum registro.");
       }
     } catch (error) {
-      Alert.alert('A busca falhou.');
+      Alert.alert("A busca falhou.");
       setRefreshing(false);
     }
   }
@@ -148,7 +162,7 @@ export default function OrdemServico({navigation, osData}) {
     try {
       setRefreshing(true);
       closeModal();
-      
+
       const result = await getOSDoMes({
         tecnicoId: userCode,
         periodo: data.periodo,
@@ -160,34 +174,69 @@ export default function OrdemServico({navigation, osData}) {
       setRefreshing(false);
 
       if (!result.length > 0) {
-        Alert.alert('Não encontramos nenhum registro. Revise os dados e tente novamente!')
+        Alert.alert(
+          "Não encontramos nenhum registro. Revise os dados e tente novamente!"
+        );
       }
-
     } catch (error) {
-      Alert.alert('A busca falhou.');
-      console.log('searchos:erro ', error);
+      Alert.alert("A busca falhou.");
+      console.log("searchos:erro ", error);
       setRefreshing(false);
     }
-  };
+  }
 
-  const {osAbertas, osFechadas} = useMemo(() => ({osAbertas: getOSAbertas(ordens), osFechadas: getOSFechadas(ordens)}), [ordens]);
+  const { osAbertas, osFechadas } = useMemo(
+    () => ({
+      osAbertas: getOSAbertas(ordens),
+      osFechadas: getOSFechadas(ordens),
+    }),
+    [ordens]
+  );
 
-  const renderOsAbertas = useCallback(() => <OSList onRefresh={refreshSearch} isRefreshing={refreshing} isLoading={loading} ListaOS={osAbertas} />, [osAbertas, loading, refreshing]);
-  const renderOsFechadas = useCallback(() => <OSList onRefresh={refreshSearch} isRefreshing={refreshing} isLoading={loading} ListaOS={osFechadas} />, [osFechadas, loading, refreshing]);
+  const renderOsAbertas = useCallback(
+    () => (
+      <OSList
+        onRefresh={refreshSearch}
+        isRefreshing={refreshing}
+        isLoading={loading}
+        ListaOS={osAbertas}
+      />
+    ),
+    [osAbertas, loading, refreshing]
+  );
+  const renderOsFechadas = useCallback(
+    () => (
+      <OSList
+        onRefresh={refreshSearch}
+        isRefreshing={refreshing}
+        isLoading={loading}
+        ListaOS={osFechadas}
+      />
+    ),
+    [osFechadas, loading, refreshing]
+  );
 
   // const memorizedOsAbertasRender = useMemo(() => renderOsAbertas, [osAbertas, loading, refreshing])
   // const memorizedOsFechadasRender = useMemo(() => renderOsFechadas, [osFechadas, loading, refreshing])
-  
+
   return (
     <Container>
-      <TabNavigator.Navigator backBehavior="none" tabBarOptions={{indicatorStyle : {backgroundColor: colors.primary}}}>
-        <TabNavigator.Screen name="Abertas" options={{title: `ABERTAS - ${osAbertas.length}`}}>
+      <TabNavigator.Navigator
+        backBehavior="none"
+        screenOptions={{ indicatorStyle: { backgroundColor: colors.primary } }}
+      >
+        <TabNavigator.Screen
+          name="Abertas"
+          options={{ title: `ABERTAS - ${osAbertas.length}` }}
+        >
           {renderOsAbertas}
         </TabNavigator.Screen>
-        <TabNavigator.Screen name="Fechadas" options={{title: `FECHADAS - ${osFechadas.length}`}}>
+        <TabNavigator.Screen
+          name="Fechadas"
+          options={{ title: `FECHADAS - ${osFechadas.length}` }}
+        >
           {renderOsFechadas}
         </TabNavigator.Screen>
-        
       </TabNavigator.Navigator>
 
       {/*<Button title="cadc" onPress={() => navigation.navigate('Detalhes')} /> */}
@@ -195,7 +244,7 @@ export default function OrdemServico({navigation, osData}) {
       <Modalize
         ref={modalizeRef}
         adjustToContentHeight
-        keyboardAvoidingBehavior={Platform.OS === 'ios' ? 'padding' : 'heigth'}
+        keyboardAvoidingBehavior={Platform.OS === "ios" ? "padding" : "heigth"}
         HeaderComponent={
           <ModalHeader>
             <Title>Faça sua pesquisa</Title>
@@ -206,7 +255,6 @@ export default function OrdemServico({navigation, osData}) {
         }
       >
         <View>
-          
           <ControlledInput
             control={control}
             name="cliente"
@@ -229,12 +277,11 @@ export default function OrdemServico({navigation, osData}) {
 
           <ButtonDefault
             fullWidth
-            style={{marginBottom: 5}}
+            style={{ marginBottom: 5 }}
             onPress={handleSubmit(searchOs)}
           >
             Pesquisar
           </ButtonDefault>
-          
         </View>
       </Modalize>
     </Container>
@@ -250,5 +297,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: colors.secondary,
   },
-  loadingContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

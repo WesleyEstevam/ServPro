@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-community/async-storage';
-import React, { createContext, useEffect, useState } from 'react';
+import AsyncStorage from "@react-native-community/async-storage";
+import React, { createContext, useEffect, useState } from "react";
 
 export const AppContext = createContext();
 
@@ -9,7 +9,7 @@ export default function AppProvider({ children }) {
 
   useEffect(() => {
     async function getStoragedOrdens() {
-      const ordens = await AsyncStorage.getItem('@App:Ordens');
+      const ordens = await AsyncStorage.getItem("@App:Ordens");
 
       if (ordens) {
         const parsedOrdens = JSON.parse(ordens);
@@ -41,36 +41,45 @@ export default function AppProvider({ children }) {
     const positionsValues = positions.map((position) => position.value);
 
     const newPositions = positionsValues.filter((pv) => {
-      const isAlreadyPersisted = osPositionsPersisted.some((pp) => pp.osId == pv.osId);
+      const isAlreadyPersisted = osPositionsPersisted.some(
+        (pp) => pp.osId == pv.osId
+      );
 
       return !isAlreadyPersisted;
     });
 
     const positoinsToPersist = [...osPositionsPersisted, ...newPositions];
 
-    await AsyncStorage.setItem('@App:osPositions', JSON.stringify(positoinsToPersist));
+    await AsyncStorage.setItem(
+      "@App:osPositions",
+      JSON.stringify(positoinsToPersist)
+    );
 
     return positoinsToPersist;
   }
 
   async function getOrdensPosition() {
-    const ordensPosition = await AsyncStorage.getItem('@App:osPositions');
+    const ordensPosition = await AsyncStorage.getItem("@App:osPositions")
+      .then(() => {
+        if (ordensPosition) {
+          return JSON.parse(ordensPosition);
+        }
 
-    if (ordensPosition) {
-      return JSON.parse(ordensPosition);
-    }
-
-    return [];
+        return [];
+      })
+      .catch((err) => {
+        console.log("Aqui também tem erro " + err);
+      });
   }
 
   async function setAllOrdens(ordens) {
-    await AsyncStorage.setItem('@App:Ordens', JSON.stringify(ordens));
+    await AsyncStorage.setItem("@App:Ordens", JSON.stringify(ordens));
 
     setOrdens(ordens);
   }
 
   async function clearStorage() {
-    await AsyncStorage.multiRemove(['@App:osPositions', '@App:Ordens']);
+    await AsyncStorage.multiRemove(["@App:osPositions", "@App:Ordens"]);
     setOrdens([]);
   }
 

@@ -1,28 +1,29 @@
-import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import OrdemServico from '../../pages/OrdemServico';
-import Detalhes from '../../pages/Detalhes';
-import {colors} from '../../styles';
+import OrdemServico from "../../pages/OrdemServico";
+import Detalhes from "../../pages/Detalhes";
+import { colors } from "../../styles";
 // import { useNavigation } from "@react-navigation/core";
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {TouchableOpacity} from 'react-native';
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { TouchableOpacity } from "react-native";
 
 const Stack = createStackNavigator();
 
 // const navigation = useNavigation();
 
-const DrawerMenu = ({navigation}) => {
+const DrawerMenu = ({ navigation }) => {
   return (
     <TouchableOpacity
       onPress={() => {
         navigation.openDrawer();
-      }}>
+      }}
+    >
       <Icon
         name="menu"
         size={25}
         color={colors.primary}
-        style={{marginLeft: 15}}
+        style={{ marginLeft: 15 }}
       />
     </TouchableOpacity>
   );
@@ -35,27 +36,28 @@ const FilterIcon = () => {
         name="filter-list-alt"
         size={25}
         color={colors.primary}
-        style={{marginRight: 15}}
+        style={{ marginRight: 15 }}
       />
     </TouchableOpacity>
   );
 };
 
-const StackHome = ({navigation}) => {
+const StackHome = ({ navigation }) => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleAlign: 'center',
+        headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: colors.white,
         },
         headerTintColor: colors.primary,
-      }}>
+      }}
+    >
       <Stack.Screen
         name="OrdemServico"
         component={OrdemServico}
         options={{
-          title: 'Ordens de Serviço',
+          title: "Ordens de Serviço",
           headerLeft: () => <DrawerMenu navigation={navigation} />,
         }}
       />
