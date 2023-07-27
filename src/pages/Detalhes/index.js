@@ -4,7 +4,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { format } from "date-fns";
 import differenceInDays from "date-fns/differenceInDays";
 import { getClientData } from "../../data/services/OrdemServicosServices";
-
+import CustomDrawer from "../../components/CustomDrawer";
 import { colors } from "../../styles";
 
 import AcoesPage from "./AcoesPage";
@@ -142,7 +142,7 @@ export default function Detalhes({ navigation, route }) {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, marginTop: 10 }}>
       <TabNavigator.Navigator
         backBehavior="none"
         initialRouteName="Info"
